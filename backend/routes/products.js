@@ -1,4 +1,6 @@
 const Router = require('express').Router;
+const mongodb = require('mongodb');
+const MongoClient = mongodb.MongoClient;
 
 const router = Router();
 
@@ -82,7 +84,15 @@ router.post('', (req, res, next) => {
     price: parseFloat(req.body.price), // store this as 128bit decimal in MongoDB
     image: req.body.image
   };
-  console.log(newProduct);
+  const uri = "mongodb+srv://max:Mak@6503@cluster0-fnrcd.mongodb.net/shop?retryWrites=true&w=majority";
+  MongoClient.connect(uri, { useNewUrlParser: true }, { useUnifiedTopology: true })
+  .then(client => {
+    client.db().collection('products').insertOne(newProduct);
+    client.close();
+  })
+  .catch(err => {
+    console.log(err);
+  });
   res.status(201).json({ message: 'Product added', productId: 'DUMMY' });
 });
 
