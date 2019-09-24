@@ -2,7 +2,7 @@ const mongodb = require("mongodb");
 
 const MongoClient = mongodb.MongoClient;
 
-const uri ="mongodb+srv://max:4YDLvUUkSJfSZSYq@cluster0-fnrcd.mongodb.net/shop?retryWrites=true&w=majority&connectTimeoutMS=3600000";
+const uri ="mongodb+srv://max:ciutV8VOTGHIs04v@cluster0-fnrcd.mongodb.net/shop?retryWrites=true&w=majority";
 
 let _db;
 
@@ -15,6 +15,7 @@ const initDb = callback => {
   MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(client => {
       _db = client.db();
+      callback(null, _db);
     })
     .catch(err => {
       callback(err);
