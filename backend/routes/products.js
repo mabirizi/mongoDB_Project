@@ -87,11 +87,10 @@ router.get("/", (req, res, next) => {
           products.push(productDoc);
         })
         .then(result => {
-          console.log(result);
           client.close();
           res
             .status(200)
-            .json([products]);
+            .json(products);
         })
         .catch(err => {
           console.log(err);
