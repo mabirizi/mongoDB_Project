@@ -58,16 +58,52 @@ const products = [
 router.get("/", (req, res, next) => {
   // Return a list of dummy products
   // Later, this data will be fetched from MongoDB
-  const queryPage = req.query.page;
-  const pageSize = 5;
-  let resultProducts = [...products];
-  if (queryPage) {
-    resultProducts = products.slice(
-      (queryPage - 1) * pageSize,
-      queryPage * pageSize
-    );
-  }
-  res.json(resultProducts);
+
+  // const queryPage = req.query.page;
+  // const pageSize = 5;
+  // let resultProducts = [...products];
+  // if (queryPage) {
+  //   resultProducts = products.slice(
+  //     (queryPage - 1) * pageSize,
+  //     queryPage * pageSize
+  //   );
+  // }
+
+  const uri =
+    "mongodb+srv://max:Mak@6503@cluster0-fnrcd.mongodb.net/shop?retryWrites=true&w=majority";
+  MongoClient.connect(
+    uri,
+    { useNewUrlParser: true },
+    { useUnifiedTopology: true }
+  )
+    .then(client => {
+      const products = [];
+      client
+        .db()
+        .collection("products")
+        .find()
+        .forEach(productDoc => {
+          productDoc.price = productDoc.price.toString();
+          products.push(productDoc);
+        })
+        .then(result => {
+          console.log(result);
+          client.close();
+          res
+            .status(200)
+            .json([products]);
+        })
+        .catch(err => {
+          console.log(err);
+          client.close();
+          res.status(500).json({ message: "An Error Occured" });
+        });
+    })
+    .catch(err => {
+      console.log(err);
+     
+    });
+ 
 });
 
 // Get single product
@@ -100,17 +136,19 @@ router.post("", (req, res, next) => {
         .then(result => {
           console.log(result);
           client.close();
+          res
+            .status(201)
+            .json({ message: "Product added", productId: result.insertedId });
         })
         .catch(err => {
           console.log(err);
           client.close();
+          res.status(500).json({ message: "An Error Occured" });
         });
-      client.close();
     })
     .catch(err => {
       console.log(err);
     });
-  res.status(201).json({ message: "Product added", productId: "DUMMY" });
 });
 
 // Edit existing product
